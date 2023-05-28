@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="start">开始</button>
+    <button class="pause">暂停</button>
+    <button class="resume">取消暂停</button>
+    <button class="stop">停止</button>
+    <button class="restart">重新开始</button>
+    <script type="module">
+      import startable from "../../startable.js";
+
+      function getTask(autoStart) {
+        return new startable({
+          run: ({ next, context }) => {
+            if (context.count == undefined) context.count = 0;
+            console.log(`task[${context.name}] run ${++context.count} turn`);
+            setTimeout(next, 10);
+          },
+          autoStart,
+        });
+      }
+
+      let task = getTask();
+      let startBtn = document.getElementsByClassName("start")[0];
+      let pauseBtn = document.getElementsByClassName("pause")[0];
+      let stopBtn = document.getElementsByClassName("stop")[0];
+      let resumeBtn = document.getElementsByClassName("resume")[0];
+      let restartBtn = document.getElementsByClassName("restart")[0];
+
+      startBtn.addEventListener("click", () => {
+        task.start();
+      });
+      pauseBtn.addEventListener("click", () => {
+        task.pause();
+      });
+      stopBtn.addEventListener("click", () => {
+        task.stop();
+      });
+      resumeBtn.addEventListener("click", () => {
+        task.resume();
+      });
+      restartBtn.addEventListener("click", () => {
+        if (task.isRunning()) {
+          task.stop();
+        }
+        task = getTask(true);
+      });
+    </script>
+  </body>
+</html>

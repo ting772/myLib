@@ -6,19 +6,25 @@ const STATES = {
   ENDED: 4,
 };
 
-export function listConsumer(options) {
-  let { autoStart, run, initialParams } = options;
+let taskId = 0;
+
+export default function startable(options) {
+  let { autoStart, run, initialParams, name } = options;
+  name = name ?? `task-${++taskId}`;
 
   let state = STATES.INITIAL;
   const signals = [];
-  const context = {};
+  const context = {
+    name,
+  };
 
   const nextCreator = () => {
     const ret = (end) => {
       if (ret.called) return;
       ret.called = true;
       if (end) state = STATES.ENDED;
-      for (let callback of signals) {
+      let callback;
+      while ((callback = signals.shift())) {
         callback();
       }
       if (state == STATES.RUNNING) run(runContextCreator());
@@ -80,9 +86,14 @@ export function listConsumer(options) {
     if (state !== STATES.INITIAL) {
       throw Error("start调用只能在初始状态调用");
     }
+
     initialParams = params;
+    state = STATES.RUNNING;
     run(runContextCreator());
   };
+
+  const isRunning = () => state == STATES.RUNNING;
+  const isStopped = () => state == STATES.STOPPED;
 
   if (autoStart) {
     Promise.resolve().then(() => {
@@ -90,9 +101,12 @@ export function listConsumer(options) {
     });
   }
   return {
+    name,
     pause,
     stop,
     resume,
     start,
+    isRunning,
+    isStopped,
   };
 }
