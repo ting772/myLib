@@ -1,0 +1,25 @@
+<html>
+
+<head></head>
+
+<body>
+  <script type="module">
+    import bufferList from '../../bufferList.js'
+
+    let list = bufferList({
+      timeout: 100,
+      debug: true,
+      handle(arr) {
+        console.log(arr.join('|'))
+      }
+    })
+    list.start()
+
+    document.addEventListener('mousemove', (e) => {
+      list.append(`x:${e.pageX}，y:${e.pageY}`)
+    })
+
+  </script>
+</body>
+
+</html>

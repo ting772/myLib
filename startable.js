@@ -8,8 +8,13 @@ const STATES = {
 
 let taskId = 0;
 
-export default function startable(options) {
+export default function Startable(options) {
   let { autoStart, run, initialParams, name } = options;
+
+  if (!(this instanceof Startable)) {
+    return new Startable(options);
+  }
+
   name = name ?? `task-${++taskId}`;
 
   let state = STATES.INITIAL;
@@ -100,7 +105,8 @@ export default function startable(options) {
       start(initialParams);
     });
   }
-  return {
+
+  Object.assign(this, {
     name,
     pause,
     stop,
@@ -108,5 +114,5 @@ export default function startable(options) {
     start,
     isRunning,
     isStopped,
-  };
+  });
 }

@@ -1,0 +1,50 @@
+<html>
+
+<head></head>
+
+<body>
+  <p id="total">total:0</p>
+  <p id="current">current:0</p>
+  <p id="left">left:0</p>
+  <p id="handled">handled:0</p>
+
+  <script type="module">
+    import concurrentList from '../../concurrentList.js'
+
+    let elTotal = document.getElementById('total')
+    let elCurrent = document.getElementById('current')
+    let elLeft = document.getElementById('left')
+    let elHandled = document.getElementById('handled')
+
+    const setText = (el, text) => {
+      el.textContent = text
+    }
+
+    let count = 0
+    let list = concurrentList({
+      handle: (item, { context, initialParams, done }) => {
+        setTimeout(() => {
+          console.log(item)
+          setText(elHandled, `handled:${++count}`)
+          done()
+        }, Math.random() * 200 + 200)
+      },
+      onTotalUpdate: (total) => {
+        setText(elTotal, `total:${total}`)
+      },
+      onCurrentUpdate: (current) => {
+        setText(elCurrent, `current:${current}`)
+      },
+      onListLeftUpdate: (left) => {
+        setText(elLeft, `left:${left}`)
+      }
+    })
+    list.start()
+
+    document.addEventListener('mousemove', (e) => {
+      list.append(`x:${e.pageX}，y:${e.pageY}`)
+    })
+  </script>
+</body>
+
+</html>
